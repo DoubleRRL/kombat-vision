@@ -8,42 +8,43 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Military Command Center Theme */
-    --background: 210 20% 8%;
-    --foreground: 120 100% 85%;
+    /* Military Command Center Theme - Camo Green Focused */
+    --background: 120 15% 8%;
+    --foreground: 120 30% 85%;
 
-    --card: 210 25% 12%;
-    --card-foreground: 120 100% 90%;
+    --card: 120 20% 12%;
+    --card-foreground: 120 25% 88%;
 
-    --popover: 210 25% 10%;
-    --popover-foreground: 120 100% 90%;
+    --popover: 120 20% 10%;
+    --popover-foreground: 120 25% 88%;
 
-    --primary: 120 100% 40%;
-    --primary-foreground: 210 20% 5%;
+    --primary: 120 40% 35%;
+    --primary-foreground: 120 15% 5%;
 
-    --secondary: 80 30% 25%;
-    --secondary-foreground: 120 100% 90%;
+    --secondary: 90 25% 22%;
+    --secondary-foreground: 120 25% 88%;
 
-    --muted: 210 15% 15%;
-    --muted-foreground: 120 50% 65%;
+    --muted: 120 12% 15%;
+    --muted-foreground: 120 20% 60%;
 
-    --accent: 120 100% 50%;
-    --accent-foreground: 210 20% 5%;
+    --accent: 120 35% 40%;
+    --accent-foreground: 120 15% 5%;
 
-    --destructive: 0 100% 55%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 80% 50%;
+    --destructive-foreground: 120 40% 98%;
 
-    --border: 120 30% 20%;
-    --input: 210 20% 15%;
-    --ring: 120 100% 50%;
+    --border: 120 25% 18%;
+    --input: 120 18% 15%;
+    --ring: 120 35% 40%;
 
-    /* Military-specific colors */
-    --tactical-olive: 80 30% 25%;
-    --enemy-red: 0 100% 55%;
-    --friendly-green: 120 100% 40%;
-    --alert-amber: 45 100% 60%;
-    --command-blue: 210 100% 60%;
-    --stealth-gray: 210 10% 30%;
+    /* Military-specific colors - Camo palette */
+    --tactical-olive: 90 25% 22%;
+    --enemy-red: 0 80% 50%;
+    --friendly-green: 120 40% 35%;
+    --alert-amber: 45 85% 55%;
+    --command-blue: 210 70% 50%;
+    --stealth-gray: 120 8% 28%;
+    --time-red: 0 100% 65%;
     
     /* Gradients */
     --gradient-tactical: linear-gradient(135deg, hsl(var(--tactical-olive)), hsl(var(--background)));

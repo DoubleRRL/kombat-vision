@@ -70,7 +70,12 @@ export default {
 					amber: 'hsl(var(--alert-amber))',
 					blue: 'hsl(var(--command-blue))',
 					gray: 'hsl(var(--stealth-gray))'
-				}
+				},
+				'time-red': 'hsl(var(--time-red))'
+			},
+			fontFamily: {
+				'military': ['Orbitron', 'Helvetica', 'Arial', 'sans-serif'],
+				'sans': ['Helvetica', 'Arial', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

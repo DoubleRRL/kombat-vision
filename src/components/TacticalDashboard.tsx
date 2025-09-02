@@ -115,8 +115,8 @@ export const TacticalDashboard: React.FC = () => {
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <Clock className="h-4 w-4 text-tactical-blue" />
-              <span className="text-sm font-mono text-tactical-blue">
+              <Clock className="h-4 w-4 text-time-red" />
+              <span className="text-sm font-mono text-time-red font-bold">
                 {new Date().toLocaleTimeString()}
               </span>
             </div>

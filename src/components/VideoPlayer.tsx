@@ -126,28 +126,44 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </div>
               </div>
 
-              {/* Target Detection Boxes */}
+              {/* Target Detection Boxes - More Dynamic */}
               <div className="absolute top-1/4 left-1/3 w-20 h-24 border-2 border-tactical-red rounded animate-pulse">
-                <div className="absolute -top-6 left-0 bg-tactical-red/90 text-background text-xs px-2 py-1 rounded">
-                  TARGET 1
+                <div className="absolute -top-6 left-0 bg-tactical-red/90 text-background text-xs px-2 py-1 rounded font-military">
+                  HOSTILE
+                </div>
+                <div className="absolute bottom-0 left-0 bg-tactical-red/70 text-background text-xs px-1 py-0.5 rounded-br font-mono">
+                  87%
                 </div>
               </div>
               <div className="absolute top-1/2 right-1/4 w-16 h-20 border-2 border-tactical-red rounded animate-pulse">
-                <div className="absolute -top-6 left-0 bg-tactical-red/90 text-background text-xs px-2 py-1 rounded">
-                  TARGET 2
+                <div className="absolute -top-6 left-0 bg-tactical-red/90 text-background text-xs px-2 py-1 rounded font-military">
+                  PERSON
+                </div>
+                <div className="absolute bottom-0 left-0 bg-tactical-red/70 text-background text-xs px-1 py-0.5 rounded-br font-mono">
+                  94%
+                </div>
+              </div>
+              <div className="absolute bottom-1/3 left-1/4 w-18 h-22 border-2 border-tactical-amber rounded animate-pulse">
+                <div className="absolute -top-6 left-0 bg-tactical-amber/90 text-background text-xs px-2 py-1 rounded font-military">
+                  UNKNOWN
+                </div>
+                <div className="absolute bottom-0 left-0 bg-tactical-amber/70 text-background text-xs px-1 py-0.5 rounded-br font-mono">
+                  72%
                 </div>
               </div>
 
-              {/* SLAM Trajectory */}
+              {/* SLAM Trajectory and Movement Path */}
               <svg className="absolute inset-0 w-full h-full">
                 <path
                   d="M 50 300 Q 150 250 250 280 T 450 260"
                   stroke="hsl(var(--friendly-green))"
-                  strokeWidth="3"
+                  strokeWidth="2"
                   fill="none"
-                  strokeDasharray="5,5"
-                  className="animate-pulse opacity-70"
+                  strokeDasharray="8,4"
+                  className="animate-pulse opacity-80"
                 />
+                <circle cx="450" cy="260" r="4" fill="hsl(var(--friendly-green))" className="animate-ping" />
+                <text x="460" y="265" className="text-xs fill-current text-tactical-green font-military">POSITION</text>
               </svg>
             </div>
           )}

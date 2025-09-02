@@ -76,7 +76,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoUpload }) => {
             </div>
           </div>
           
-          <Button variant="tactical" size="lg" className="font-bold">
+          <Button variant="tactical" size="lg" className="font-sans font-bold">
             SELECT VIDEO FILE
           </Button>
         </div>
