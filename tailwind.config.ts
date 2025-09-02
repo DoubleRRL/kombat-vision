@@ -61,6 +61,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Military tactical colors
+				tactical: {
+					olive: 'hsl(var(--tactical-olive))',
+					red: 'hsl(var(--enemy-red))',
+					green: 'hsl(var(--friendly-green))',
+					amber: 'hsl(var(--alert-amber))',
+					blue: 'hsl(var(--command-blue))',
+					gray: 'hsl(var(--stealth-gray))'
 				}
 			},
 			borderRadius: {

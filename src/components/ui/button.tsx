@@ -18,6 +18,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        tactical: "bg-tactical-green text-background hover:bg-tactical-green/90 border border-tactical-green/50 font-bold tracking-wider shadow-[0_0_20px_hsl(var(--friendly-green)/0.3)]",
+        command: "bg-tactical-blue text-background hover:bg-tactical-blue/90 border border-tactical-blue/50",
+        alert: "bg-tactical-red text-background hover:bg-tactical-red/90 border border-tactical-red/50",
       },
       size: {
         default: "h-10 px-4 py-2",
