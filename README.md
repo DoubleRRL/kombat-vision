@@ -1,73 +1,63 @@
-# Welcome to your Lovable project
+# CV/SLAM Video Analysis Tool
 
-## Project info
+Real-time computer vision and SLAM pipeline for video annotation and target detection. Integrates thermal detection algorithms from the kombat-drone project with a web-based interface for video analysis and export.
 
-**URL**: https://lovable.dev/projects/10edf4e2-5f38-4393-8338-7a5f64304ee0
+## Architecture
 
-## How can I edit this code?
+**Frontend**: React/TypeScript with real-time video player and annotation display
+**Backend**: FastAPI with OpenCV-based thermal detection pipeline
+**CV Pipeline**: Temperature-based target detection (287 FPS processing speed)
 
-There are several ways of editing your application.
+## Performance Metrics
 
-**Use Lovable**
+- **Detection Speed**: 287 FPS on M2 MacBook Air
+- **Target Classification**: Personnel, vehicles, aircraft, equipment
+- **Confidence Scoring**: Temperature-based thermal signature analysis
+- **Processing**: Real-time frame-by-frame analysis with live progress updates
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/10edf4e2-5f38-4393-8338-7a5f64304ee0) and start prompting.
+## Quick Start
 
-Changes made via Lovable will be committed automatically to this repo.
+```bash
+# Clone repository
+git clone https://github.com/DoubleRRL/kombat-vision.git
+cd kombat-vision
 
-**Use your preferred IDE**
+# Install frontend dependencies
+npm install
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+# Setup backend
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+# Start backend (terminal 1)
+cd backend && source venv/bin/activate && python main.py
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start frontend (terminal 2)
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Access the application at `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## CV Pipeline Features
 
-**Use GitHub Codespaces**
+- **Thermal Detection**: Temperature thresholding with contour analysis
+- **Multi-class Classification**: Hostile personnel, vehicles, aircraft threats
+- **Real-time Processing**: Async video processing with live status updates
+- **Performance Monitoring**: FPS tracking, confidence scoring, detection counts
+- **Export Capabilities**: Annotated video output with embedded detection data
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## API Endpoints
 
-## What technologies are used for this project?
+- `POST /upload-video` - Upload video files for analysis
+- `POST /start-processing` - Trigger CV pipeline processing
+- `GET /processing-status` - Real-time processing progress
+- `GET /detections` - Detection results and performance metrics
+- `GET /detections/frame/{n}` - Frame-specific detection data
 
-This project is built with:
+## Technology Stack
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/10edf4e2-5f38-4393-8338-7a5f64304ee0) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+**Frontend**: React, TypeScript, Tailwind CSS, shadcn/ui
+**Backend**: FastAPI, OpenCV, NumPy
+**CV Pipeline**: Temperature-based detection algorithms from kombat-drone project
