@@ -24,3 +24,6 @@ pandas>=1.1.4
 
 # File handling
 aiofiles>=23.0.0
+
+# System monitoring
+psutil>=5.9.0

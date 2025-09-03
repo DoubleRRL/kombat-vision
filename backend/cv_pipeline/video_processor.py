@@ -6,6 +6,9 @@ import cv2
 import numpy as np
 import time
 import asyncio
+import gc
+import psutil
+import os
 from typing import Dict, Any, List, Optional, Callable
 from pathlib import Path
 import json
@@ -17,15 +20,15 @@ from .thermal_detector import WorkingThermalDetector, Detection, create_test_the
 class VideoProcessor:
     """
     Process video files with CV/SLAM pipeline
-    Applies thermal detection and tracks performance metrics
+    Includes error recovery, memory management, and progress persistence
     """
-    
+
     def __init__(self, progress_callback: Optional[Callable] = None):
         self.thermal_detector = WorkingThermalDetector(mode="balanced")
         self.progress_callback = progress_callback
         self.is_processing = False
         self.should_stop = False
-        
+
         # Processing state
         self.current_frame = 0
         self.total_frames = 0
@@ -36,6 +39,13 @@ class VideoProcessor:
             'avg_confidence': 0.0,
             'processing_time_ms': 0.0
         }
+
+        # Error recovery and memory management
+        self.max_memory_mb = 2048  # 2GB memory limit
+        self.checkpoint_interval = 100  # Save progress every 100 frames
+        self.max_consecutive_errors = 5
+        self.error_count = 0
+        self.last_checkpoint_frame = 0
     
     async def process_video(self, video_path: str) -> Dict[str, Any]:
         """
@@ -73,51 +83,89 @@ class VideoProcessor:
             while True:
                 if self.should_stop:
                     break
-                
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                
-                frame_start = time.time()
-                
-                # Convert to thermal-like representation for testing
-                # In production, this would be actual thermal data
-                thermal_frame = self._simulate_thermal_from_rgb(frame)
-                
-                # Apply thermal detection
-                detections, frame_performance = self.thermal_detector.detect_thermal_targets(thermal_frame)
-                
-                # Store frame results
-                frame_result = {
-                    'frame_number': self.current_frame,
-                    'timestamp': self.current_frame / fps if fps > 0 else 0,
-                    'detections': [asdict(d) for d in detections],
-                    'performance': frame_performance
-                }
-                
-                self.detections_history.append(frame_result)
-                all_detections.extend(detections)
-                
-                # Track timing
-                frame_time = time.time() - frame_start
-                frame_times.append(frame_time)
-                
-                self.current_frame += 1
-                
-                # Update progress
-                progress = (self.current_frame / self.total_frames) * 100
-                if self.progress_callback:
-                    await self.progress_callback({
-                        'progress': progress,
-                        'current_frame': self.current_frame,
-                        'total_frames': self.total_frames,
-                        'detections_count': len(all_detections),
-                        'current_fps': frame_performance.get('fps', 0)
-                    })
-                
-                # Yield control to allow other operations
-                if self.current_frame % 10 == 0:
-                    await asyncio.sleep(0.001)
+
+                try:
+                    # Memory management check
+                    if self.current_frame % 50 == 0:  # Check every 50 frames
+                        memory_usage = self._check_memory_usage()
+                        if memory_usage > self.max_memory_mb:
+                            print(f"Memory limit exceeded: {memory_usage}MB > {self.max_memory_mb}MB")
+                            self._cleanup_memory()
+
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+
+                    frame_start = time.time()
+
+                    # Convert to thermal-like representation for testing
+                    # In production, this would be actual thermal data
+                    thermal_frame = self._simulate_thermal_from_rgb(frame)
+
+                    # Apply thermal detection with error handling
+                    try:
+                        detections, frame_performance = self.thermal_detector.detect_thermal_targets(thermal_frame)
+                        self.error_count = 0  # Reset error count on success
+                    except Exception as e:
+                        print(f"Detection error on frame {self.current_frame}: {e}")
+                        self.error_count += 1
+
+                        if self.error_count >= self.max_consecutive_errors:
+                            raise Exception(f"Too many consecutive errors ({self.error_count}). Stopping processing.")
+
+                        # Use empty detections for failed frame
+                        detections = []
+                        frame_performance = {'fps': 0, 'inference_time_ms': 0, 'detections_count': 0, 'avg_confidence': 0}
+
+                    # Store frame results
+                    frame_result = {
+                        'frame_number': self.current_frame,
+                        'timestamp': self.current_frame / fps if fps > 0 else 0,
+                        'detections': [asdict(d) for d in detections],
+                        'performance': frame_performance,
+                        'error_count': self.error_count
+                    }
+
+                    self.detections_history.append(frame_result)
+                    all_detections.extend(detections)
+
+                    # Track timing
+                    frame_time = time.time() - frame_start
+                    frame_times.append(frame_time)
+
+                    self.current_frame += 1
+
+                    # Progress persistence - save checkpoint
+                    if self.current_frame % self.checkpoint_interval == 0:
+                        self._save_checkpoint(video_path, self.current_frame)
+
+                    # Update progress
+                    progress = (self.current_frame / self.total_frames) * 100
+                    if self.progress_callback:
+                        await self.progress_callback({
+                            'progress': progress,
+                            'current_frame': self.current_frame,
+                            'total_frames': self.total_frames,
+                            'detections_count': len(all_detections),
+                            'current_fps': frame_performance.get('fps', 0),
+                            'memory_usage_mb': self._check_memory_usage(),
+                            'error_count': self.error_count
+                        })
+
+                    # Yield control to allow other operations
+                    if self.current_frame % 10 == 0:
+                        await asyncio.sleep(0.001)
+
+                except Exception as frame_error:
+                    print(f"Critical error processing frame {self.current_frame}: {frame_error}")
+                    self.error_count += 1
+
+                    if self.error_count >= self.max_consecutive_errors:
+                        raise Exception(f"Critical processing failure: {frame_error}")
+
+                    # Skip this frame and continue
+                    self.current_frame += 1
+                    continue
             
             cap.release()
             
@@ -239,6 +287,103 @@ class VideoProcessor:
     def get_all_detections(self) -> List[Dict[str, Any]]:
         """Get all detection results"""
         return self.detections_history
+
+    def _check_memory_usage(self) -> float:
+        """Check current memory usage in MB"""
+        try:
+            process = psutil.Process(os.getpid())
+            memory_info = process.memory_info()
+            return memory_info.rss / (1024 * 1024)  # Convert to MB
+        except:
+            return 0.0
+
+    def _cleanup_memory(self):
+        """Force garbage collection and memory cleanup"""
+        print("Performing memory cleanup...")
+
+        # Limit detection history to last 1000 frames to save memory
+        if len(self.detections_history) > 1000:
+            self.detections_history = self.detections_history[-1000:]
+            print(f"Trimmed detection history to last 1000 frames")
+
+        # Force garbage collection
+        gc.collect()
+
+        print(f"Memory usage after cleanup: {self._check_memory_usage():.1f}MB")
+
+    def _save_checkpoint(self, video_path: str, frame_number: int):
+        """Save processing checkpoint for recovery"""
+        try:
+            checkpoint_data = {
+                'video_path': video_path,
+                'frame_number': frame_number,
+                'total_frames': self.total_frames,
+                'detections_count': len([d for frame in self.detections_history for d in frame["detections"]]),
+                'timestamp': time.time(),
+                'performance_metrics': self.performance_metrics
+            }
+
+            checkpoint_file = f"backend/checkpoints/checkpoint_{int(time.time())}.json"
+            os.makedirs("backend/checkpoints", exist_ok=True)
+
+            with open(checkpoint_file, 'w') as f:
+                json.dump(checkpoint_data, f, indent=2)
+
+            # Keep only last 5 checkpoints
+            self._cleanup_old_checkpoints()
+
+            self.last_checkpoint_frame = frame_number
+            print(f"Checkpoint saved at frame {frame_number}")
+
+        except Exception as e:
+            print(f"Failed to save checkpoint: {e}")
+
+    def _cleanup_old_checkpoints(self):
+        """Keep only the most recent checkpoints"""
+        try:
+            checkpoint_dir = "backend/checkpoints"
+            if not os.path.exists(checkpoint_dir):
+                return
+
+            checkpoints = [f for f in os.listdir(checkpoint_dir) if f.startswith('checkpoint_')]
+            checkpoints.sort(key=lambda x: os.path.getctime(os.path.join(checkpoint_dir, x)), reverse=True)
+
+            # Keep only last 5 checkpoints
+            for old_checkpoint in checkpoints[5:]:
+                try:
+                    os.remove(os.path.join(checkpoint_dir, old_checkpoint))
+                except:
+                    pass
+        except Exception as e:
+            print(f"Failed to cleanup old checkpoints: {e}")
+
+    def can_resume_processing(self, video_path: str) -> Optional[Dict[str, Any]]:
+        """Check if processing can be resumed from a checkpoint"""
+        try:
+            checkpoint_dir = "backend/checkpoints"
+            if not os.path.exists(checkpoint_dir):
+                return None
+
+            checkpoints = [f for f in os.listdir(checkpoint_dir) if f.startswith('checkpoint_')]
+            if not checkpoints:
+                return None
+
+            # Get most recent checkpoint
+            latest_checkpoint = max(checkpoints,
+                                  key=lambda x: os.path.getctime(os.path.join(checkpoint_dir, x)))
+
+            with open(os.path.join(checkpoint_dir, latest_checkpoint), 'r') as f:
+                checkpoint_data = json.load(f)
+
+            # Check if checkpoint is for the same video
+            if checkpoint_data.get('video_path') == video_path:
+                return checkpoint_data
+
+            return None
+
+        except Exception as e:
+            print(f"Failed to check for resume capability: {e}")
+            return None
 
 
 async def test_video_processor():

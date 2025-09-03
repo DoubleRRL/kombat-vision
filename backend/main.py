@@ -13,6 +13,7 @@ from typing import Dict, Any, List
 import json
 
 from cv_pipeline.video_processor import VideoProcessor
+from utils.file_validator import VideoFileValidator, FileValidationError
 
 app = FastAPI(title="CV/SLAM Analysis API", version="1.0.0")
 
@@ -55,58 +56,66 @@ async def root():
 async def upload_video(file: UploadFile = File(...)):
     """
     Upload video file for CV/SLAM analysis
-    Baby Step: Just accept and validate the file for now
+    Now with robust file validation to prevent crashes
     """
-    # Input validation
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No file provided")
-    
-    # Check file type
-    allowed_extensions = {'.mp4', '.avi', '.mov', '.mkv', '.webm'}
-    file_ext = os.path.splitext(file.filename)[1].lower()
-    if file_ext not in allowed_extensions:
+    try:
+        # Read file content
+        content = await file.read()
+
+        # Comprehensive file validation
+        is_valid, error_message = VideoFileValidator.validate_file(content, file.filename)
+
+        if not is_valid:
+            raise HTTPException(status_code=400, detail=f"File validation failed: {error_message}")
+
+        # Get video information
+        video_info = VideoFileValidator.get_video_info(content, file.filename)
+
+        print(f"Valid video uploaded: {video_info['filename']}")
+        print(f"  Resolution: {video_info['width']}x{video_info['height']}")
+        print(f"  Duration: {video_info['duration_seconds']:.1f}s")
+        print(f"  FPS: {video_info['fps']:.1f}")
+        print(f"  Size: {video_info['size_mb']:.1f}MB")
+
+    except HTTPException:
+        raise  # Re-raise HTTP exceptions
+    except Exception as e:
         raise HTTPException(
-            status_code=400, 
-            detail=f"Unsupported file type: {file_ext}. Allowed: {allowed_extensions}"
+            status_code=500,
+            detail=f"File processing error: {str(e)}"
         )
-    
-    # Check file size (limit to 500MB for now)
-    max_size = 500 * 1024 * 1024  # 500MB
-    file_size = 0
-    content = await file.read()
-    file_size = len(content)
-    
-    if file_size > max_size:
-        raise HTTPException(
-            status_code=400,
-            detail=f"File too large: {file_size / 1024 / 1024:.1f}MB. Max: 500MB"
-        )
-    
-    # Save file temporarily (in production, use proper storage)
-    upload_dir = "backend/uploads"
-    os.makedirs(upload_dir, exist_ok=True)
-    
-    file_path = os.path.join(upload_dir, file.filename)
-    with open(file_path, "wb") as f:
-        f.write(content)
-    
-    # Update global state
-    processing_state["current_video"] = {
-        "filename": file.filename,
-        "path": file_path,
-        "size": file_size,
-        "uploaded_at": time.time()
-    }
-    processing_state["progress"] = 0
-    processing_state["detections"] = []
-    processing_state["slam_data"] = None
-    
-    return {
-        "message": "Video uploaded successfully",
-        "filename": file.filename,
-        "size": file_size,
-        "status": "ready_for_processing"
-    }
+
+        # Save validated file
+        upload_dir = "backend/uploads"
+        os.makedirs(upload_dir, exist_ok=True)
+
+        # Use safe filename
+        safe_filename = f"{int(time.time())}_{file.filename}"
+        file_path = os.path.join(upload_dir, safe_filename)
+
+        with open(file_path, "wb") as f:
+            f.write(content)
+
+        # Update global state with video info
+        processing_state["current_video"] = {
+            "filename": file.filename,
+            "safe_filename": safe_filename,
+            "path": file_path,
+            "size": video_info["size_bytes"],
+            "uploaded_at": time.time(),
+            "video_info": video_info
+        }
+        processing_state["progress"] = 0
+        processing_state["detections"] = []
+        processing_state["slam_data"] = None
+
+        return {
+            "message": "Video uploaded and validated successfully",
+            "filename": file.filename,
+            "size": video_info["size_bytes"],
+            "video_info": video_info,
+            "status": "ready_for_processing"
+        }
 
 @app.post("/start-processing")
 async def start_processing():
