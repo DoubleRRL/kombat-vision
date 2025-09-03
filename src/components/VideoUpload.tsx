@@ -43,14 +43,14 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoUpload }) => {
   });
 
   return (
-    <Card className="tactical-upload-zone border-tactical-green/30 bg-card hover:border-tactical-green/50 transition-all duration-300">
+    <Card className="tactical-upload-zone border-green-400/30 bg-card hover:border-green-400/50 transition-all duration-300">
       <div
         {...getRootProps()}
         className={`
           p-12 text-center cursor-pointer rounded-lg transition-all duration-300
           ${isDragActive || dropzoneActive 
-            ? 'bg-tactical-green/10 border-2 border-dashed border-tactical-green' 
-            : 'border-2 border-dashed border-muted hover:border-tactical-green/50'
+            ? 'bg-green-400/10 border-2 border-dashed border-green-400' 
+            : 'border-2 border-dashed border-muted hover:border-green-400/50'
           }
         `}
       >
@@ -58,7 +58,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoUpload }) => {
         
         <div className="flex flex-col items-center space-y-4">
           {isDragActive || dropzoneActive ? (
-            <Upload className="h-16 w-16 text-tactical-green animate-pulse" />
+            <Upload className="h-16 w-16 text-green-400 animate-pulse" />
           ) : (
             <FileVideo className="h-16 w-16 text-muted-foreground" />
           )}
@@ -70,7 +70,7 @@ export const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoUpload }) => {
             <p className="text-muted-foreground">
               Drag & drop your building walkthrough video or click to browse
             </p>
-            <div className="flex items-center justify-center space-x-2 text-sm text-tactical-amber">
+            <div className="flex items-center justify-center space-x-2 text-sm text-amber-400">
               <AlertTriangle className="h-4 w-4" />
               <span>Supported: MP4, AVI, MOV, MKV, WebM, FLV</span>
             </div>

@@ -186,14 +186,14 @@ export const TacticalDashboard: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Header */}
       <div
-        className="relative h-40 bg-cover bg-center border-b border-tactical-green/30"
+        className="relative h-40 bg-cover bg-center border-b border-green-400/30"
         style={{ backgroundImage: `url(${tacticalHero})` }}
       >
         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
         <div className="relative h-full flex items-center justify-between px-8">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <Shield className="h-8 w-8 text-tactical-green" />
+              <Shield className="h-8 w-8 text-green-400" />
               <div>
                 <h1 className="text-2xl font-bold text-foreground tracking-wider">
                   CV/SLAM Video ANALYSIS
@@ -212,11 +212,11 @@ export const TacticalDashboard: React.FC = () => {
                 {new Date().toLocaleTimeString()}
               </span>
             </div>
-            <Badge variant="outline" className={`${backendConnected ? 'text-tactical-green border-tactical-green/50' : 'text-red-500 border-red-500/50'}`}>
+            <Badge variant="outline" className={`${backendConnected ? 'text-green-400 border-green-400/50' : 'text-red-500 border-red-500/50'}`}>
               <Satellite className="h-3 w-3 mr-1" />
               {backendConnected ? 'CV BACKEND ONLINE' : 'CV BACKEND OFFLINE'}
             </Badge>
-            <Badge variant="outline" className={`${isProcessing ? 'text-tactical-amber border-tactical-amber/50' : 'text-muted-foreground border-muted-foreground/50'}`}>
+            <Badge variant="outline" className={`${isProcessing ? 'text-amber-400 border-amber-400/50' : 'text-muted-foreground border-muted-foreground/50'}`}>
               <Radar className="h-3 w-3 mr-1" />
               {isProcessing ? 'PROCESSING' : 'STANDBY'}
             </Badge>
@@ -246,7 +246,7 @@ export const TacticalDashboard: React.FC = () => {
               />
               
               {/* Re-upload option */}
-              <div className="bg-muted/30 border border-tactical-green/20 rounded-lg p-4">
+              <div className="bg-muted/30 border border-green-400/20 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-semibold text-foreground">Current Video</h4>

@@ -36,23 +36,23 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const [frameSkip, setFrameSkip] = React.useState([1]);
 
   return (
-    <Card className="bg-card border-tactical-green/30">
+    <Card className="bg-card border-green-400/30">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center space-x-3">
-          <Settings className="h-5 w-5 text-tactical-green" />
+          <Settings className="h-5 w-5 text-green-400" />
           <h3 className="text-lg font-bold text-foreground">MISSION CONTROL</h3>
-          <Badge variant="outline" className="text-tactical-green border-tactical-green/50">
+          <Badge variant="outline" className="text-green-400 border-green-400/50">
             OPERATIONAL
           </Badge>
         </div>
 
-        <Separator className="bg-tactical-green/20" />
+        <Separator className="bg-green-400/20" />
 
         {/* CV Pipeline Settings */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Target className="h-4 w-4 text-tactical-red" />
+            <Target className="h-4 w-4 text-red-400" />
             <h4 className="font-semibold text-foreground">Detection Parameters</h4>
           </div>
           
@@ -60,7 +60,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label htmlFor="confidence" className="text-sm">Confidence Threshold</Label>
-                <span className="text-sm font-mono text-tactical-green">
+                <span className="text-sm font-mono text-green-400">
                   {(confidence[0] * 100).toFixed(0)}%
                 </span>
               </div>
@@ -77,7 +77,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label htmlFor="frameskip" className="text-sm">Frame Skip</Label>
-                <span className="text-sm font-mono text-tactical-blue">
+                <span className="text-sm font-mono text-blue-400">
                   {frameSkip[0]}
                 </span>
               </div>
@@ -94,12 +94,12 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           </div>
         </div>
 
-        <Separator className="bg-tactical-green/20" />
+        <Separator className="bg-green-400/20" />
 
         {/* SLAM Settings */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Map className="h-4 w-4 text-tactical-green" />
+            <Map className="h-4 w-4 text-green-400" />
             <h4 className="font-semibold text-foreground">SLAM Configuration</h4>
           </div>
           
@@ -113,12 +113,12 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           </div>
         </div>
 
-        <Separator className="bg-tactical-green/20" />
+        <Separator className="bg-green-400/20" />
 
         {/* HUD Settings */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Eye className="h-4 w-4 text-tactical-amber" />
+            <Eye className="h-4 w-4 text-amber-400" />
             <h4 className="font-semibold text-foreground">HUD Display</h4>
           </div>
           
@@ -132,12 +132,12 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           </div>
         </div>
 
-        <Separator className="bg-tactical-green/20" />
+        <Separator className="bg-green-400/20" />
 
         {/* Action Buttons */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Shield className="h-4 w-4 text-tactical-blue" />
+            <Shield className="h-4 w-4 text-blue-400" />
             <h4 className="font-semibold text-foreground">Mission Actions</h4>
           </div>
 
@@ -182,23 +182,23 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         </div>
 
         {/* System Status */}
-        <div className="bg-tactical-green/10 border border-tactical-green/30 rounded-lg p-4">
+        <div className="bg-green-400/10 border border-green-400/30 rounded-lg p-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">CV Pipeline</span>
-              <Badge variant="outline" className="text-tactical-green border-tactical-green/50">
+              <Badge variant="outline" className="text-green-400 border-green-400/50">
                 READY
               </Badge>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">SLAM System</span>
-              <Badge variant="outline" className={`${enableSLAM ? 'text-tactical-green border-tactical-green/50' : 'text-muted-foreground border-muted'}`}>
+              <Badge variant="outline" className={`${enableSLAM ? 'text-green-400 border-green-400/50' : 'text-muted-foreground border-muted'}`}>
                 {enableSLAM ? 'ACTIVE' : 'DISABLED'}
               </Badge>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">HUD Overlay</span>
-              <Badge variant="outline" className={`${showHUD ? 'text-tactical-amber border-tactical-amber/50' : 'text-muted-foreground border-muted'}`}>
+              <Badge variant="outline" className={`${showHUD ? 'text-amber-400 border-amber-400/50' : 'text-muted-foreground border-muted'}`}>
                 {showHUD ? 'ENABLED' : 'DISABLED'}
               </Badge>
             </div>
